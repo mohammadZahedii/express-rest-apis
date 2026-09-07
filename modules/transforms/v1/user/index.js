@@ -1,3 +1,4 @@
+const { it } = require("zod/locales");
 const Transform = require("../../transform");
 const CourseTransform = require(`${config.path.transforms}/v1/course`);
 
@@ -10,13 +11,13 @@ class UserTransform extends Transform {
     this.createToken = createToken;
 
     return {
-      id: item._id,
+      id: item?._id || item?.id,
       name: item.name,
       email: item.email,
       avatar: this.transformAvatar(item.avatar),
       roles: item.roles || [],
+      courses: item?.courses || [],
       ...this.withToken(item),
-      ...this.showCourses(item),
     };
   };
 
@@ -68,22 +69,6 @@ class UserTransform extends Transform {
     }
 
     return {};
-  };
-
-  showCourses = (item) => {
-    if (this.withCoursesStatus) {
-      return {
-        courses: CourseTransform.withEpisodes().transformCollection(
-          item.courses,
-        ),
-      };
-    }
-    return { courses: [] };
-  };
-
-  withCourses = () => {
-    this.withCoursesStatus = true;
-    return this;
   };
 }
 

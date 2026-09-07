@@ -2,11 +2,9 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const MongoosePaginate = require("mongoose-paginate-v2");
 
-
-
 const CourseSchema = new Schema(
   {
-    user: { type: Schema.Types.ObjectId, ref: "User" },
+    users: [{ type: Schema.Types.ObjectId, ref: "User" }],
     title: { type: String, required: true },
     body: { type: String, required: true },
     price: { type: String, required: true },
@@ -31,7 +29,7 @@ const CourseSchema = new Schema(
       createdAt: "created_at",
       updatedAt: "updated_at",
     },
-  }
+  },
 );
 
 CourseSchema.plugin(MongoosePaginate);

@@ -18,7 +18,7 @@ class CourseTransform extends Transform {
       price: item.price,
       images: this.transformImages(item.images),
       ...this.showEpisodes(item),
-      ...this.showUser(item),
+      ...this.showUsers(item),
     };
   };
 
@@ -45,17 +45,17 @@ class CourseTransform extends Transform {
     return {};
   };
 
-  showUser = (item) => {
-    if (this.withUserStatus) {
+  showUsers = (item) => {
+    if (this.withUsersStatus) {
       return {
-        user: UserTransform.transform(item.user),
+        users: UserTransform.transformCollection(item.users),
       };
     }
     return {};
   };
 
-  withUser = () => {
-    this.withUserStatus = true;
+  withUsers = () => {
+    this.withUsersStatus = true;
     return this;
   };
 

@@ -62,7 +62,6 @@ class AdminCourseController extends Controller {
     try {
       const userExists = await this.models.User.findById(req.body.user_id);
 
-      console.log(userExists, "USEREXISTS");
       if (!userExists) {
         return res.status(404).json({
           success: false,
@@ -84,30 +83,55 @@ class AdminCourseController extends Controller {
 
       const { user_id, ...courseData } = validationData;
 
+      //first create the course and then add the user to the
+      // course's users array and add the course to the user's courses array
       let savedCourse = await this.models.Course.create({
         ...courseData,
-        user: user_id,
+        users: [user_id],
       });
 
+      await this.models.User.findByIdAndUpdate(
+        req.body.user_id,
+        {
+          $addToSet: {
+            courses: savedCourse._id,
+          },
+        },
+        {
+          runValidators: true,
+        },
+      );
+
       await savedCourse.populate([
-        "images",
-        "episodes",
-        { path: "user", populate: "roles" },
+        { path: "images" },
+        { path: "episodes" },
+        {
+          path: "users",
+          populate: [
+            { path: "roles" },
+            { path: "courses", select: "title body price id" },
+          ],
+        },
       ]);
 
       return res.status(201).json({
         message: "Course created",
-        data: CourseTransform.withEpisodes().withUser().transform(savedCourse),
+        data: CourseTransform.withEpisodes().withUsers().transform(savedCourse),
       });
     } catch (error) {
       console.error(error, "ERROR");
       this.errorHandler(error, res);
     }
   }
+
   async update(req, res) {
+    const userId = req?.body?.user_id;
+
     try {
       //Validation
-      const validationData = this.validations.courseValidation.parse(req.body);
+      const validationData = this.validations.courseValidation.update.parse(
+        req.body,
+      );
       //check all images exist in media collection and are images
       const imagesError = await this.validateImages(validationData.images);
       if (imagesError) {
@@ -116,19 +140,43 @@ class AdminCourseController extends Controller {
         });
       }
 
+      //update courses on user model
+      if (userId) {
+        await this.models.User.findByIdAndUpdate(userId, {
+          $addToSet: { courses: req.params.id },
+        });
+      }
+
+      const updateQuery = {
+        $set: courseData,
+      };
+
+      if (userId) {
+        updateQuery.$addToSet = {
+          users: userId,
+        };
+      }
+
       const updatedCourse = await this.models.Course.findByIdAndUpdate(
         req.params.id,
-        validationData,
+        updateQuery,
         {
           new: true,
           runValidators: false,
         },
       )
         .populate("images")
-        .populate("episodes");
+        .populate("episodes")
+        .populate({
+          path: "users",
+          populate: [{ path: "courses", select: "title body price id" }],
+        });
 
-      res.json({
-        data: CourseTransform.withEpisodes().transform(updatedCourse),
+      await res.json({
+        success: true,
+        data: CourseTransform.withEpisodes()
+          .withUsers()
+          .transform(updatedCourse),
       });
     } catch (error) {
       console.error(error, "ERROR");

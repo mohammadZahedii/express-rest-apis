@@ -15,7 +15,6 @@ class UserController extends Controller {
       data: UserTransform.transform(req.user),
     });
   };
-
   update = async (req, res) => {
     const userId = req.user._id;
 
@@ -110,7 +109,7 @@ class UserController extends Controller {
       res.json({
         success: true,
         message: "User updated successfully",
-        data: UserTransform.withCourses().transform(updatedUser),
+        data: UserTransform.transform(updatedUser),
       });
     } catch (error) {
       this.errorHandler(error, res);
