@@ -186,17 +186,34 @@ class AdminCourseController extends Controller {
 
   async destroy(req, res) {
     try {
-      const paramId = req.params.id;
+      const courseId = req.params.id;
 
-      if (!paramId) {
+      if (!courseId) {
         return res.status(404).json({
           message: "Not found any course",
         });
       }
 
-      const findedCourse = await this.models.Course.findByIdAndDelete(paramId);
+      const findedCourse = await this.models.Course.findByIdAndDelete(
+        courseId,
+      ).select("-users -episodes -images");
 
-      res.json({ message: "successfully deleted", data: findedCourse });
+      await this.models.User.updateMany(
+        {
+          courses: findedCourse._id,
+        },
+        {
+          $pull: {
+            courses: findedCourse._id,
+          },
+        },
+      );
+
+      res.json({
+        success: true,
+        message: "successfully deleted",
+        data: findedCourse,
+      });
     } catch (error) {
       throw error;
     }

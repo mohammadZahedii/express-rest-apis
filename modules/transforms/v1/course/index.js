@@ -13,6 +13,7 @@ class CourseTransform extends Transform {
 
   transform = (item) => {
     return {
+      id: item._id,
       title: item.title,
       body: item.body,
       price: item.price,
