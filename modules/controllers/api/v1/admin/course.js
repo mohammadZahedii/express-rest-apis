@@ -198,6 +198,10 @@ class AdminCourseController extends Controller {
         courseId,
       ).select("-users -episodes -images");
 
+      const episodeIds = Array.isArray(findedCourse.episodes)
+        ? findedCourse.episodes
+        : [];
+
       await this.models.User.updateMany(
         {
           courses: findedCourse._id,
@@ -208,6 +212,14 @@ class AdminCourseController extends Controller {
           },
         },
       );
+
+      if (episodeIds.length > 0) {
+        await this.models.Episode.deleteMany({
+          _id: {
+            $in: episodeIds,
+          },
+        });
+      }
 
       res.json({
         success: true,
