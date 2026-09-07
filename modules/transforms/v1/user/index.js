@@ -1,4 +1,5 @@
 const Transform = require("../../transform");
+const CourseTransform = require(`${config.path.transforms}/v1/course`);
 
 const MediaTransform = require("../media");
 
@@ -15,6 +16,7 @@ class UserTransform extends Transform {
       avatar: this.transformAvatar(item.avatar),
       roles: item.roles || [],
       ...this.withToken(item),
+      ...this.showCourses(item),
     };
   };
 
@@ -66,6 +68,22 @@ class UserTransform extends Transform {
     }
 
     return {};
+  };
+
+  showCourses = (item) => {
+    if (this.withCoursesStatus) {
+      return {
+        courses: CourseTransform.withEpisodes().transformCollection(
+          item.courses,
+        ),
+      };
+    }
+    return { courses: [] };
+  };
+
+  withCourses = () => {
+    this.withCoursesStatus = true;
+    return this;
   };
 }
 

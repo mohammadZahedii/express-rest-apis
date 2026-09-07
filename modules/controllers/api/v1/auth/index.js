@@ -79,7 +79,7 @@ class AuthController extends Controller {
 
       //remove before expires tokens to not being crowded db
       user.refreshToken = user.refreshToken.filter(
-        (t) => t.expiresAt > new Date()
+        (t) => t.expiresAt > new Date(),
       );
 
       user.refreshToken.push({
@@ -100,7 +100,6 @@ class AuthController extends Controller {
   };
 
   //new method for refreshToken
-
   refresh = async (req, res) => {
     try {
       const { refreshToken } = req.body;
@@ -145,14 +144,14 @@ class AuthController extends Controller {
       const newAccessToken = jwt.sign(
         { user_id: user._id },
         global.config.secret.accessToken,
-        { expiresIn: "2h" }
+        { expiresIn: "2h" },
       );
 
       //for more safety create (Rotate) our refresh token to have more age on it
       const newRefreshToken = jwt.sign(
         { user_id: user._id },
         global.config.secret.refreshToken,
-        { expiresIn: "7d" }
+        { expiresIn: "7d" },
       );
 
       //update new refresh token in db

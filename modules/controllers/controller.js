@@ -33,6 +33,10 @@ class Controller {
         single: mediaValidation.singleDeleteSchema,
         bulk: mediaValidation.bulkDeleteSchema,
       },
+      course: {
+        create: courseValidation.create,
+        update: courseValidation.update,
+      },
     };
   }
 

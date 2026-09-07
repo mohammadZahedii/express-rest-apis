@@ -15,7 +15,6 @@ class HomeCourseController extends Controller {
             message: "user id format is invalid",
           });
         }
-
         const userExists = await this.models.User.exists({ _id: userId });
 
         if (!userExists) {

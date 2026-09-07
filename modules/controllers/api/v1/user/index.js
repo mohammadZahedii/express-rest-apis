@@ -110,7 +110,7 @@ class UserController extends Controller {
       res.json({
         success: true,
         message: "User updated successfully",
-        data: UserTransform.transform(updatedUser),
+        data: UserTransform.withCourses().transform(updatedUser),
       });
     } catch (error) {
       this.errorHandler(error, res);

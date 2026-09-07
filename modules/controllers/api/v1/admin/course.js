@@ -60,9 +60,20 @@ class AdminCourseController extends Controller {
 
   async create(req, res) {
     try {
-      //Validation
-      const validationData = this.validations.courseValidation.parse(req.body);
+      const userExists = await this.models.User.findById(req.body.user_id);
 
+      console.log(userExists, "USEREXISTS");
+      if (!userExists) {
+        return res.status(404).json({
+          success: false,
+          message: "user_id is invalid",
+        });
+      }
+
+      //Validation
+      const validationData = this.validations.courseValidation.create.parse(
+        req.body,
+      );
       //check all images exist in media collection and are images
       const imagesError = await this.validateImages(validationData.images);
       if (imagesError) {
@@ -71,13 +82,22 @@ class AdminCourseController extends Controller {
         });
       }
 
-      let savedCourse = await this.models.Course.create(validationData);
+      const { user_id, ...courseData } = validationData;
 
-      await savedCourse.populate(["images", "episodes"]);
+      let savedCourse = await this.models.Course.create({
+        ...courseData,
+        user: user_id,
+      });
+
+      await savedCourse.populate([
+        "images",
+        "episodes",
+        { path: "user", populate: "roles" },
+      ]);
 
       return res.status(201).json({
         message: "Course created",
-        data: CourseTransform.withEpisodes().transform(savedCourse),
+        data: CourseTransform.withEpisodes().withUser().transform(savedCourse),
       });
     } catch (error) {
       console.error(error, "ERROR");

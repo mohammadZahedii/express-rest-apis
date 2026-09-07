@@ -2,11 +2,13 @@ const Transform = require("../../transform");
 
 const EpisodeTransform = require(`${config.path.transforms}/v1/episode`);
 const MediaTransform = require(`${config.path.transforms}/v1/media`);
+const UserTransform = require(`${config.path.transforms}/v1/user`);
 
 class CourseTransform extends Transform {
   constructor() {
     super();
     this.withEpisodesStatus = false;
+    this.withUserStatus = false;
   }
 
   transform = (item) => {
@@ -16,6 +18,7 @@ class CourseTransform extends Transform {
       price: item.price,
       images: this.transformImages(item.images),
       ...this.showEpisodes(item),
+      ...this.showUser(item),
     };
   };
 
@@ -41,11 +44,27 @@ class CourseTransform extends Transform {
     }
     return {};
   };
+
+  showUser = (item) => {
+    if (this.withUserStatus) {
+      return {
+        user: UserTransform.transform(item.user),
+      };
+    }
+    return {};
+  };
+
+  withUser = () => {
+    this.withUserStatus = true;
+    return this;
+  };
+
   withEpisodes = () => {
     this.withEpisodesStatus = true;
     // console.log(this, "THIS");
     return this;
   };
+
   withPaginate(result) {
     return {
       items: result.docs,
