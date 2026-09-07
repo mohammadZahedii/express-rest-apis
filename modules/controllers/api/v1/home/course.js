@@ -30,6 +30,7 @@ class HomeCourseController extends Controller {
 
       const courses = await this.models.Course.find(queries)
         .populate("user", "name avatar")
+        .populate("images")
         .populate("episodes", "title body price video_url");
 
       res.json({
@@ -52,6 +53,7 @@ class HomeCourseController extends Controller {
 
       const course = await this.models.Course.findById(req.params.id)
         .populate("user", "avatar name")
+        .populate("images")
         .populate("episodes", "title body price video_url");
 
       res.json({

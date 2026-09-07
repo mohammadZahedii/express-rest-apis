@@ -10,7 +10,7 @@ const CourseSchema = new Schema(
     title: { type: String, required: true },
     body: { type: String, required: true },
     price: { type: String, required: true },
-    image: { type: String, required: true },
+    images: [{ type: Schema.Types.ObjectId, ref: "Media" }],
     episodes: [{ type: Schema.Types.ObjectId, ref: "Episode" }],
   },
   {

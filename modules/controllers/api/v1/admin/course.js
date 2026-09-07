@@ -22,6 +22,7 @@ class AdminCourseController extends Controller {
           limit: req?.query?.limit || 1,
           populate: [
             { path: "user", select: "avatar name email" },
+            { path: "images" },
             {
               path: "episodes",
               select: "-course",
@@ -45,9 +46,9 @@ class AdminCourseController extends Controller {
           message: "Not found any course",
         });
       }
-      const course = await this.models.Course.findById(req.params.id).populate(
-        "episodes",
-      );
+      const course = await this.models.Course.findById(req.params.id)
+        .populate("episodes")
+        .populate("images");
       res.json({
         message: "Success",
         data: course,
@@ -60,29 +61,40 @@ class AdminCourseController extends Controller {
   async create(req, res) {
     try {
       //Validation
+      const validationData = this.validations.courseValidation.parse(req.body);
 
-      const validationData = this.validations.courseSchema.parse(req.body);
+      //check all images exist in media collection and are images
+      const imagesError = await this.validateImages(validationData.images);
+      if (imagesError) {
+        return res.status(imagesError.status).json({
+          message: imagesError.message,
+        });
+      }
 
-      const newCourse = new this.models.Course(validationData);
+      let savedCourse = await this.models.Course.create(validationData);
 
-      console.log("before store course", newCourse);
+      await savedCourse.populate(["images", "episodes"]);
 
-      const savedCourse = await newCourse.save();
-
-      console.log("After store course", savedCourse);
-
-      res.status(200).json({ message: "Course created", data: savedCourse });
+      return res.status(201).json({
+        message: "Course created",
+        data: CourseTransform.withEpisodes().transform(savedCourse),
+      });
     } catch (error) {
       console.error(error, "ERROR");
       this.errorHandler(error, res);
     }
   }
-
   async update(req, res) {
     try {
       //Validation
-
-      const validationData = this.validations.courseSchema.parse(req.body);
+      const validationData = this.validations.courseValidation.parse(req.body);
+      //check all images exist in media collection and are images
+      const imagesError = await this.validateImages(validationData.images);
+      if (imagesError) {
+        return res.status(imagesError.status).json({
+          message: imagesError.message,
+        });
+      }
 
       const updatedCourse = await this.models.Course.findByIdAndUpdate(
         req.params.id,
@@ -91,9 +103,13 @@ class AdminCourseController extends Controller {
           new: true,
           runValidators: false,
         },
-      );
+      )
+        .populate("images")
+        .populate("episodes");
 
-      res.json({ data: updatedCourse });
+      res.json({
+        data: CourseTransform.withEpisodes().transform(updatedCourse),
+      });
     } catch (error) {
       console.error(error, "ERROR");
       this.errorHandler(error, res);

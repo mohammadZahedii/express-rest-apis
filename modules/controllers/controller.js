@@ -59,6 +59,36 @@ class Controller {
       res.status(error?.statusCode || 500).json({ message: error.message });
     }
   }
+
+  async validateImages(imageIds) {
+    if (!imageIds?.length) return null;
+
+    const uniqueImageIds = [...new Set(imageIds.map(String))];
+
+    const mediaFiles = await this.models.Media.find({
+      _id: { $in: uniqueImageIds },
+    })
+      .select("_id fileType")
+      .lean();
+
+    if (mediaFiles.length !== uniqueImageIds.length) {
+      return {
+        status: 404,
+        message: "One or more image media not found",
+      };
+    }
+
+    const hasNonImage = mediaFiles.some((media) => media.fileType !== "image");
+
+    if (hasNonImage) {
+      return {
+        status: 400,
+        message: "Course images must be image files",
+      };
+    }
+
+    return null;
+  }
 }
 
 module.exports = Controller;
