@@ -1,6 +1,8 @@
 const Controller = require("../../../controller");
 const UserTransform = require("./../../../../transforms/v1/user");
 
+const { ROLE_KEYS } = require(`${config.path.constants}`);
+
 const jwt = require("jsonwebtoken");
 
 class AuthController extends Controller {
@@ -21,11 +23,18 @@ class AuthController extends Controller {
         });
       }
 
-      const userData = await this.models.User.create({
+      const baseRole = await this.models.Role.findOne({ key: ROLE_KEYS.USER });
+
+      const createdUser = await this.models.User.create({
         name: result.name,
         email: result.email,
         password: result.password,
+        roles: [baseRole._id],
       });
+
+      const userData = await this.models.User.findById(
+        createdUser._id,
+      ).populate("roles");
 
       //transform user data with user transform and force it by 'true' to create token
       const transformedUser = UserTransform.transform(userData, true);
