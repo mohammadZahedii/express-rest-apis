@@ -12,6 +12,10 @@ module.exports = {
       api: path.resolve("./modules/controllers/api"),
       web: path.resolve("./modules/controllers/web.js"),
     },
+    database: {
+      index: path.resolve("./database"),
+      seeders: path.resolve("./database/seeders"),
+    },
     transforms: path.resolve("./modules/transforms"),
     validations: path.resolve("./modules/validations"),
     models: path.resolve("./modules/models"),

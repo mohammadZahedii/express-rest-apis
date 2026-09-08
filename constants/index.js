@@ -1,7 +1,12 @@
+const ROLE_KEYS = Object.freeze({
+  USER: "basic_user",
+  EDITOR: "editor",
+  ADMIN: "admin",
+});
+
 const PERMISSIONS = Object.freeze({
   //access to all permissions in super admin role
   SUPER_ADMIN: "*",
-
   //courses permissions
   COURSES_ALL: "courses:*",
   COURSES_READ: "courses:read",
@@ -19,4 +24,5 @@ const PERMISSIONS = Object.freeze({
 
 module.exports = {
   PERMISSIONS,
+  ROLE_KEYS,
 };

@@ -6,17 +6,27 @@ const webRouter = require("./modules/routes/web.js");
 const apiRouter = require("./modules/routes/api/index.js");
 const mongoose = require("mongoose");
 
+const seedDefaultRoles = require(
+  `${config.path.database.seeders}/role.seeder.js`,
+);
+
 //connect to DB
-const connectToDB = async () => {
+const mainEngine = async () => {
   try {
     await mongoose.connect("mongodb://127.0.0.1:27018/nexor");
     console.log("DATABASE CONNECTED");
+
+    await seedDefaultRoles();
+
+    console.log("Role seeding completed successfully.");
   } catch (error) {
+    console.error("Role seeding failed.");
+    process.exitCode = 1;
     console.error("DATABASE CONNECTION FAILED:", error.message);
     process.exit(1);
   }
 };
-connectToDB();
+mainEngine();
 
 const app = express();
 
@@ -27,7 +37,7 @@ app.use(
     fallthrough: true,
     index: false,
     dotfiles: "deny",
-  })
+  }),
 );
 
 /**

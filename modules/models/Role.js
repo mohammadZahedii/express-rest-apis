@@ -5,23 +5,34 @@ const Schema = mongoose.Schema;
 
 const RoleSchema = new Schema(
   {
-    name: {
+    key: {
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+    },
+    name: {
+      type: String,
+      required: true,
       trim: true,
-      lowercase: true, // like: 'admin', 'teacher', 'author'
     },
     label: {
       type: String,
-      required: true, //role label
+      required: true,
+      trim: true,
     },
+
     permissions: [
       {
         type: String,
         enum: Object.values(PERMISSIONS),
       },
     ],
+    isSystem: {
+      type: Boolean,
+      default: false,
+      immutable: true,
+    },
   },
 
   {
@@ -39,7 +50,7 @@ const RoleSchema = new Schema(
       //put virtual fields like id in final object
     },
     timestamps: true,
-  }
+  },
 );
 
 module.exports = mongoose.model("Role", RoleSchema);
