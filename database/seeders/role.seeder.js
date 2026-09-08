@@ -7,7 +7,11 @@ const defaultRoles = [
     key: ROLE_KEYS.USER,
     name: "user",
     label: "کاربر عادی",
-    permissions: [PERMISSIONS.COURSES_READ],
+    permissions: [
+      PERMISSIONS.COURSES_READ,
+      PERMISSIONS.ROLES_READ,
+      PERMISSIONS.ROLES_UPDATE,
+    ],
     isSystem: true,
   },
   {
@@ -40,7 +44,10 @@ async function seedDefaultRoles() {
           key: role.key,
         },
         update: {
-          $setOnInsert: roleData,
+          $set: roleData,
+          $setOnInsert: {
+            key,
+          },
         },
         upsert: true,
       },

@@ -4,6 +4,7 @@ const { PERMISSIONS } = require(`${config.path.constants}`);
 const validPermissions = Object.values(PERMISSIONS);
 
 const createRoleSchema = z.object({
+  key: z.string("کلید نقش الزامی است").trim().toLowerCase(),
   name: z
     .string("نام لاتین نقش الزامی است")
     .trim()
@@ -20,7 +21,7 @@ const createRoleSchema = z.object({
       z.enum(validPermissions, {
         error: "یک یا چند دسترسی انتخاب‌شده نامعتبر است",
       }),
-      { error: "لیست دسترسی‌ها باید به صورت آرایه ارسال شود" }
+      { error: "لیست دسترسی‌ها باید به صورت آرایه ارسال شود" },
     )
     .default([]),
 });

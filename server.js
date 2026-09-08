@@ -15,13 +15,10 @@ const mainEngine = async () => {
   try {
     await mongoose.connect("mongodb://127.0.0.1:27018/nexor");
     console.log("DATABASE CONNECTED");
-
     await seedDefaultRoles();
-
     console.log("Role seeding completed successfully.");
   } catch (error) {
     console.error("Role seeding failed.");
-    process.exitCode = 1;
     console.error("DATABASE CONNECTION FAILED:", error.message);
     process.exit(1);
   }
