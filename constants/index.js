@@ -22,7 +22,12 @@ const PERMISSIONS = Object.freeze({
   ROLES_DELETE: "roles:delete",
 });
 
+const STATUS_VALUES = Object.freeze({
+  project: ["in_progress", "completed", "archived"],
+});
+
 module.exports = {
   PERMISSIONS,
   ROLE_KEYS,
+  STATUS_VALUES,
 };

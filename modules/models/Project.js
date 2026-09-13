@@ -24,9 +24,9 @@ const ProjectSchema = new Schema(
       enum: ["in_progress", "completed", "archived"],
       default: "completed",
     },
-    featured: { type: Boolean, default: false },
-    startedAt: { type: Date },
-    finishedAt: { type: Date },
+    // featured: { type: Boolean, default: false },
+    // startedAt: { type: Date },
+    // finishedAt: { type: Date },
   },
   {
     toJSON: {

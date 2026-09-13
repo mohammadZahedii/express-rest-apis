@@ -8,11 +8,18 @@ const Media = require(`${config.path.models}/Media`);
 const Role = require(`${config.path.models}/Role`);
 
 //Validations
+//course
 const courseValidation = require(`${config.path.validations}/course`);
+//episode
 const episodeValidation = require(`${config.path.validations}/episode`);
+//user
 const userValidation = require(`${config.path.validations}/user`);
+//role
 const roleValidation = require(`${config.path.validations}/role`);
+//media
 const mediaValidation = require(`${config.path.validations}/media`);
+//project
+const projectValidation = require(`${config.path.validations}/media`);
 
 class Controller {
   constructor() {
@@ -37,9 +44,12 @@ class Controller {
         create: courseValidation.create,
         update: courseValidation.update,
       },
+      project: {
+        create: projectValidation.create,
+        update: projectValidation.update,
+      },
     };
   }
-
   errorHandler(error, res) {
     if (error instanceof z.ZodError) {
       return res.status(422).json({
