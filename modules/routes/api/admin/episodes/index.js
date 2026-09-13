@@ -5,7 +5,7 @@ const router = express.Router();
 //Controller
 const { api: apiController } = config.path.controller;
 
-const AdminEpisodeController = require(`${apiController}/v1/admin/episode`);
+const AdminEpisodeController = require(`${apiController}/admin/episode`);
 
 //get as list
 router.get("/episodes", AdminEpisodeController.findAll);

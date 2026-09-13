@@ -2,7 +2,7 @@ const { z } = require("zod");
 
 const mongoose = require("mongoose");
 
-const Controller = require("../../../controller");
+const Controller = require("../../controller");
 
 class AdminRoleController extends Controller {
   findAll = async (req, res) => {
@@ -63,7 +63,7 @@ class AdminRoleController extends Controller {
       const updatedRole = await this.models.Role.findByIdAndUpdate(
         roleId,
         validationResult,
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
       );
 
       res.json({ success: true, data: updatedRole });

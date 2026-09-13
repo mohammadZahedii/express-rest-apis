@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const AdminRoleController = require(`${config.path.controller.api}/v1/admin/role`);
+const AdminRoleController = require(`${config.path.controller.api}/admin/role`);
 
 //get all roles
 router.get("/roles", AdminRoleController.findAll);

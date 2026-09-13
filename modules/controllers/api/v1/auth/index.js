@@ -1,8 +1,6 @@
 const Controller = require("../../../controller");
 const UserTransform = require("./../../../../transforms/v1/user");
-
 const { ROLE_KEYS } = require(`${config.path.constants}`);
-
 const jwt = require("jsonwebtoken");
 
 class AuthController extends Controller {
@@ -127,7 +125,6 @@ class AuthController extends Controller {
       this.errorHandler(error, res);
     }
   };
-
   //new method for refreshToken
   refresh = async (req, res) => {
     try {

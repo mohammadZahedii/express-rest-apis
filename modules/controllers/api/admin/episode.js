@@ -1,7 +1,7 @@
 const { z } = require("zod");
 const mongoose = require("mongoose");
 
-const Controller = require("../../../controller");
+const Controller = require("./../../controller");
 
 class AdminEpisodeController extends Controller {
   findAll = async (req, res) => {
@@ -92,7 +92,7 @@ class AdminEpisodeController extends Controller {
       });
 
       const newEpisode = await this.models.Episode.findById(
-        episode._id
+        episode._id,
       ).populate("course");
 
       res.json({
@@ -149,7 +149,7 @@ class AdminEpisodeController extends Controller {
         {
           new: true,
           runValidator: false,
-        }
+        },
       ).populate("course");
 
       res.json({
@@ -170,9 +170,8 @@ class AdminEpisodeController extends Controller {
         })
         .parse(req.params);
 
-      const episode = await this.models.Episode.findById(episodeId).populate(
-        "course"
-      );
+      const episode =
+        await this.models.Episode.findById(episodeId).populate("course");
 
       if (!episode) {
         return res.status(404).json({

@@ -7,7 +7,7 @@ const router = express.Router();
 //Controller
 const { api: apiController } = config.path.controller;
 
-const AdminCourseController = require(`${apiController}/v1/admin/course`);
+const AdminCourseController = require(`${apiController}/admin/course`);
 
 //get as list
 router.get("/courses", AdminCourseController.findAll);

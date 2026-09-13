@@ -5,6 +5,7 @@ const adminRouter = express.Router();
 const coursesRouter = require("./courses");
 const episodesRouter = require("./episodes");
 const rolesRouter = require("./roles");
+const projectsRouter = require("./projects");
 
 //middlewares
 const authMiddleware = require(`${config.path.middlewares}/authenticate`);
@@ -17,9 +18,10 @@ adminRouter.use(
   "/admin",
   authMiddleware,
   // permissionMiddleware(PERMISSIONS.SUPER_ADMIN),
-  rolesRouter
+  rolesRouter,
 );
 adminRouter.use("/admin", authMiddleware, coursesRouter);
 adminRouter.use("/admin", authMiddleware, episodesRouter);
+adminRouter.use("/admin", authMiddleware, projectsRouter);
 
 module.exports = adminRouter;
