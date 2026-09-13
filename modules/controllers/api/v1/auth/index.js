@@ -63,11 +63,31 @@ class AuthController extends Controller {
       const result = this.validations.user.login().parse(req.body);
 
       //check user existence from database
-      const user = await this.models.User.findOne({ email: result.email });
+      const user = await this.models.User.findOne({
+        email: result.email,
+      }).populate("roles");
+
       if (user === null) {
         return res.status(422).json({
           success: false,
           message: "اطلاعات وارد شده صحیح نیست",
+        });
+      }
+
+      //check for user is admin or not for login
+
+      let isUserAdmin = false;
+      const roles = user?.roles || [];
+      roles.forEach((role) => {
+        if (role.key === ROLE_KEYS.ADMIN) {
+          isUserAdmin = true;
+        }
+      });
+
+      if (!isUserAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: "you dont have permission",
         });
       }
 

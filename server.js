@@ -67,3 +67,42 @@ app.use("/", webRouter);
 app.listen(config.port, () => {
   console.log(`Server is running on port ${config.port}`);
 });
+
+/**
+ * ============================================================
+ * FILE DOCUMENTATION
+ * ============================================================
+ *
+ * File-level summary:
+ * -------------------
+ * server.js is the application entry point. It loads the global
+ * config, connects to the local MongoDB database ("nexor"), seeds
+ * the default roles, and bootstraps the Express app. It registers
+ * the middleware stack (static serving of uploaded files under
+ * /uploads, urlencoded and JSON body parsers), mounts the API
+ * router at /api and the web router at /, and finally starts the
+ * HTTP server on the configured port.
+ *
+ * Per-function descriptions:
+ * --------------------------
+ * mainEngine()
+ *   Purpose:  Async bootstrap for the database layer. Connects to
+ *             MongoDB at mongodb://127.0.0.1:27018/nexor via
+ *             Mongoose, then runs seedDefaultRoles() to ensure the
+ *             default roles exist.
+ *   Params:   None.
+ *   Returns:  Promise<void>; logs progress to the console.
+ *   Errors:   On connection or seeding failure, logs the error
+ *             message and terminates the process with exit code 1.
+ *
+ * app.listen callback (anonymous, () => { ... })
+ *   Purpose:  Runs once the HTTP server starts listening; logs a
+ *             confirmation message including config.port.
+ *   Params:   None.
+ *   Returns:  Nothing (side effect: console output only).
+ *
+ * seedDefaultRoles() [imported from config.path.database.seeders/role.seeder.js]
+ *   Purpose:  Seeds the default Role documents into the database;
+ *             invoked by mainEngine() right after a successful
+ *             DB connection.
+ */
