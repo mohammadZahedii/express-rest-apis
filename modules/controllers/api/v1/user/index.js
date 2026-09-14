@@ -4,9 +4,7 @@ const Controller = require("../../../controller");
 //transformers
 const UserTransform = require("./../../../../transforms/v1/user");
 
-const { deletedUselessFiles } = require(
-  `${global.config.path.middlewares}/upload`,
-);
+const { deletedUselessFiles } = require(`${config.path.middlewares}/upload`);
 
 class UserController extends Controller {
   profile = async (req, res) => {
@@ -16,11 +14,11 @@ class UserController extends Controller {
     });
   };
   update = async (req, res) => {
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     try {
       const validationResult = this.validations.user.update().parse(req.body);
-      const userData = await this.models.User.findById(req.user._id);
+      const userData = await this.models.User.findById(userId);
 
       if (!userData) {
         return res.status(404).json({

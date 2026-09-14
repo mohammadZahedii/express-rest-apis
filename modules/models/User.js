@@ -10,6 +10,7 @@ const UserSchema = new Schema(
     avatar: { type: Schema.Types.ObjectId, ref: "Media", default: null },
     courses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
     roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
+    projects: [{ type: Schema.Types.ObjectId, ref: "Project" }],
     refreshToken: [
       {
         token: String,
@@ -35,7 +36,7 @@ const UserSchema = new Schema(
       createdAt: "created_at",
       updatedAt: "updated_at",
     },
-  }
+  },
 );
 
 UserSchema.pre("save", async function () {

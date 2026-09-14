@@ -6,6 +6,7 @@ const Episode = require(`${config.path.models}/Episode`);
 const User = require(`${config.path.models}/User`);
 const Media = require(`${config.path.models}/Media`);
 const Role = require(`${config.path.models}/Role`);
+const Project = require(`${config.path.models}/Project`);
 
 //Validations
 //course
@@ -19,11 +20,11 @@ const roleValidation = require(`${config.path.validations}/role`);
 //media
 const mediaValidation = require(`${config.path.validations}/media`);
 //project
-const projectValidation = require(`${config.path.validations}/media`);
+const projectValidation = require(`${config.path.validations}/project`);
 
 class Controller {
   constructor() {
-    this.models = { Course, Episode, User, Media, Role };
+    this.models = { Course, Episode, User, Media, Role, Project };
     this.validations = {
       courseValidation,
       episode: episodeValidation,

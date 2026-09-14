@@ -5,7 +5,7 @@ const { normalizeToRelativePath } = require(`${global.config.path.utils}`);
 class MediaTransform extends Transform {
   transform = (item) => {
     return {
-      id: item._id,
+      id: item._id || item.id,
       originalName: item.originalname,
       filename: item.filename,
       mimetype: item.mimetype,
