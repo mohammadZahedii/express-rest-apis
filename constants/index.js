@@ -24,6 +24,7 @@ const PERMISSIONS = Object.freeze({
 
 const STATUS_VALUES = Object.freeze({
   project: ["in_progress", "completed", "archived"],
+  article: ["draft", "published", "archived"],
 });
 
 module.exports = {

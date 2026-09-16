@@ -6,6 +6,7 @@ const coursesRouter = require("./courses");
 const episodesRouter = require("./episodes");
 const rolesRouter = require("./roles");
 const projectsRouter = require("./projects");
+const blogRouter = require("./blog");
 
 //middlewares
 const authMiddleware = require(`${config.path.middlewares}/authenticate`);
@@ -23,5 +24,6 @@ adminRouter.use(
 adminRouter.use("/admin", authMiddleware, coursesRouter);
 adminRouter.use("/admin", authMiddleware, episodesRouter);
 adminRouter.use("/admin", authMiddleware, projectsRouter);
+adminRouter.use("/admin", authMiddleware, blogRouter);
 
 module.exports = adminRouter;
