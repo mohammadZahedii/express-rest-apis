@@ -15,6 +15,7 @@ const createArticleSchema = z.object({
     s.string().trim().min(5, "هر عنوان حداقل باید 2 کاراکتر داشته باشد"),
   ),
   status: z.enum(STATUS_VALUES.article).default("published"),
+  // TODO:normalize date input
   publishedAt: z.date().nullable().default(null),
   images: z
     .array(
