@@ -12,7 +12,7 @@ const createArticleSchema = z.object({
   }),
   category: z.string().nullable().default(null),
   tags: z.array(
-    s.string().trim().min(5, "هر عنوان حداقل باید 2 کاراکتر داشته باشد"),
+    z.string().trim().min(5, "هر عنوان حداقل باید 2 کاراکتر داشته باشد"),
   ),
   status: z.enum(STATUS_VALUES.article).default("published"),
   // TODO:normalize date input

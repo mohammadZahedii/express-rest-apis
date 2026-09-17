@@ -2,11 +2,11 @@ const express = require("express");
 const router = express.Router();
 
 //controller
-const { api: apiController } = config.path.controller.api;
+const { api: apiController } = config.path.controller;
 const AdminArticleController = require(`${apiController}/admin/article`);
 
 //middlewares
-const AuthMiddleware = require(`${config.path.middlewares}`);
+const AuthMiddleware = require(`${config.path.middlewares}/authenticate`);
 
 //TODO:
 router.get("/blog", AuthMiddleware, AdminArticleController.findAll);

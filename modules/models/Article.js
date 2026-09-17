@@ -78,4 +78,17 @@ const ArticleSchema = new Schema(
 
 ArticleSchema.plugin(MongoosePaginate);
 
+ArticleSchema.pre("save", function (next) {
+  if (this.isModified("status")) {
+    if (this.status === "published" && !this.publishedAt) {
+      this.publishedAt = new Date();
+    }
+
+    if (this.status !== "published") {
+      this.publishedAt = null;
+    }
+  }
+  next();
+});
+
 module.exports = mongoose.model("Article", ArticleSchema);
