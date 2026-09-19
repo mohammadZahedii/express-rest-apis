@@ -11,14 +11,81 @@ const { extractMediaIdsFromHTML } = require(`${config.path.utils}`);
 
 class AdminArticleController extends Controller {
   findAll = async (req, res) => {
-    res.json({ message: slugify("aritcle route controller"), data: req.user });
+    try {
+      const ariticles = await this.models.Article.find().populate([
+        { path: "author", select: "name email avatar" },
+        { path: "cover" },
+        { path: "images" },
+      ]);
+
+      res.json({
+        sucess: true,
+        data: ariticles.map((article) => {
+          return {
+            ...article.toJSON(),
+            author: {
+              ...article.author.toJSON(),
+              avatar: MediaTransform.transform(article.author.avatar),
+            },
+            images: article.images.map((image) =>
+              MediaTransform.transform(image),
+            ),
+            cover: MediaTransform.transform(article.cover),
+          };
+        }),
+      });
+    } catch (error) {
+      this.errorHandler(error, res);
+    }
   };
   findOne = async (req, res) => {
-    console.log(
-      new mongoose.Types.ObjectId("65f8a12b3c4d5e6f7a8b9c01"),
-      "ISVALID",
-    );
-    res.json({ success: true });
+    const paramId = req?.params?.id;
+
+    const isId = mongoose.Types.ObjectId.isValid(paramId);
+
+    try {
+      let queryData = {
+        _id: paramId,
+      };
+
+      if (!isId) {
+        queryData = {
+          slug: paramId,
+        };
+      }
+
+      const findedArticle = await this.models.Article.findOne(
+        queryData,
+      ).populate([
+        { path: "author", select: "name email avatar" },
+        { path: "cover" },
+        { path: "images" },
+      ]);
+
+      if (!findedArticle) {
+        return res.status(404).json({
+          success: false,
+          message: "Not found any article",
+        });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          ...findedArticle.toJSON(),
+          author: {
+            ...findedArticle.author.toJSON(),
+            avatar: MediaTransform.transform(findedArticle.author.avatar),
+          },
+          images: findedArticle.images.map((image) =>
+            MediaTransform.transform(image),
+          ),
+          cover: MediaTransform.transform(findedArticle.cover),
+        },
+      });
+    } catch (error) {
+      this.errorHandler(error, res);
+    }
   };
   create = async (req, res) => {
     try {
