@@ -9,6 +9,8 @@ const Controller = require(`${config.path.controller.index}/controller`);
 const MediaTransform = require(`${config.path.transforms}/v1/media`);
 const { extractMediaIdsFromHTML } = require(`${config.path.utils}`);
 
+const { deletedUselessFiles } = require(`${config.path.middlewares}/upload`);
+
 class AdminArticleController extends Controller {
   findAll = async (req, res) => {
     try {
@@ -179,9 +181,153 @@ class AdminArticleController extends Controller {
       this.errorHandler(error, res);
     }
   };
-  update = async (req, res) => {};
+  update = async (req, res) => {
+    try {
+      //check for articleId is valid or not
+      const { id: articleId } = z
+        .object({
+          id: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+            error: "invalid article id",
+          }),
+        })
+        .parse(req.params);
 
-  destroy = async (req, res) => {};
+      const validationRes = this.validations.article.update.parse(req.body);
+
+      //get authorId
+      const authorId = validationRes?.author;
+      //check author is valid or not
+
+      if (authorId) {
+        const isUserExist = await this.models.User.findById(authorId);
+        if (!isUserExist) {
+          return res.status(404).json({
+            success: false,
+            message: "author id is invalid",
+          });
+        }
+      }
+
+      let mediaIds = [];
+      let bodyMediaIds = [];
+
+      //if body was modified
+      if (validationRes?.body) {
+        //extract medias from html body
+        const internallBodyMediaIds = extractMediaIdsFromHTML(
+          validationRes.body,
+        );
+        bodyMediaIds = [...internallBodyMediaIds];
+        mediaIds = [...new Set([...mediaIds, ...bodyMediaIds])];
+      }
+
+      //add cover on all medias
+      if (validationRes?.cover) {
+        mediaIds.push(validationRes?.cover);
+      }
+
+      //check all media ids is based on standard shape or not
+      const { ids: finalMediaIds } = z
+        .object({
+          ids: z.array(
+            z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
+              message: "invalid media id ",
+            }),
+          ),
+        })
+        .parse({ ids: mediaIds });
+
+      //check all images is valid or not
+      const imagesError = await this.validateImages(finalMediaIds);
+      if (imagesError) {
+        return res.status(imagesError.status).json({
+          message: imagesError.message,
+        });
+      }
+
+      let parametersToUpdate = { ...validationRes };
+
+      if (validationRes?.body) {
+        parametersToUpdate = { ...parametersToUpdate, images: bodyMediaIds };
+      }
+
+      const updatedArticle = await this.models.Article.findByIdAndUpdate(
+        articleId,
+        { $set: parametersToUpdate },
+        {
+          new: true,
+          runValidator: true,
+        },
+      ).populate([
+        { path: "author", select: "name avatar email", populate: "avatar" },
+        {
+          path: "images",
+        },
+        {
+          path: "cover",
+        },
+      ]);
+
+      res.json({
+        success: true,
+        data: {
+          ...updatedArticle.toJSON(),
+          author: {
+            ...updatedArticle.author.toJSON(),
+            avatar: updatedArticle?.avatar
+              ? MediaTransform.transform(updatedArticle.author.avatar)
+              : null,
+          },
+          images: updatedArticle.images.map((image) =>
+            MediaTransform.transform(image),
+          ),
+          cover: MediaTransform.transform(updatedArticle.cover),
+        },
+      });
+    } catch (error) {
+      this.errorHandler(error, res);
+    }
+  };
+  destroy = async (req, res) => {
+    try {
+      //article id validation
+      const { id: articleId } = z
+        .object({
+          id: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val)),
+        })
+        .parse(req.params);
+
+      //check existence
+      const article =
+        await this.models.Article.findById(articleId).populate("images cover");
+
+      if (!article) {
+        return res.status(404).json({
+          success: false,
+          message: "Not found any article",
+        });
+      }
+
+      const filesToDelete = [...article.images];
+
+      if (article?.cover) filesToDelete.push(article.cover);
+
+      const mediaIds = filesToDelete.map((f) => f._id);
+
+      await this.models.Article.findByIdAndDelete(article._id);
+
+      await this.models.Media.deleteMany({ _id: { $in: mediaIds } });
+
+      deletedUselessFiles(filesToDelete);
+
+      res.json({
+        success: true,
+        message: "The article has been deleted succussfully",
+      });
+    } catch (error) {
+      this.errorHandler(error, res);
+    }
+  };
 }
 
 module.exports = new AdminArticleController();

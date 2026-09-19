@@ -3,20 +3,25 @@ const mongoose = require("mongoose");
 
 const { STATUS_VALUES } = require(`${config.path.constants}`);
 
-const createArticleSchema = z.object({
-  title: z.string(3),
-  body: z.string(10),
+const articleBaseSchema = z.object({
+  title: z.string().trim().min(3),
+  body: z.string().min(10),
   slug: z.string().trim(),
+
   cover: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
     error: "mediaId is invalid",
   }),
-  category: z.string().nullable().default(null),
-  tags: z
-    .array(z.string().trim().min(5, "هر عنوان حداقل باید 2 کاراکتر داشته باشد"))
-    .default([]),
-  status: z.enum(STATUS_VALUES.article).default("published"),
-  // TODO:normalize date input
-  publishedAt: z.date().nullable().default(null).optional(),
+
+  category: z.string().nullable(),
+
+  tags: z.array(
+    z.string().trim().min(2, "هر عنوان حداقل باید 2 کاراکتر داشته باشد"),
+  ),
+
+  status: z.enum(STATUS_VALUES.article),
+
+  publishedAt: z.date().nullable(),
+
   author: z
     .string()
     .refine((val) => mongoose.Types.ObjectId.isValid(val), {
@@ -25,7 +30,19 @@ const createArticleSchema = z.object({
     .optional(),
 });
 
-const updateArticleSchema = createArticleSchema.partial();
+const createArticleSchema = articleBaseSchema.extend({
+  category: articleBaseSchema.shape.category.default(null),
+  tags: articleBaseSchema.shape.tags.default([]),
+  status: articleBaseSchema.shape.status.default("published"),
+  publishedAt: articleBaseSchema.shape.publishedAt.default(null),
+});
+
+const updateArticleSchema = articleBaseSchema.partial().extend({
+  slug: z.never({ error: "اسلاگ مقاله قابل تغییر نیست" }).optional(),
+  publishedAt: z
+    .never({ error: "زمان انتشار مقاله قابل تغییر نیست" })
+    .optional(),
+});
 
 module.exports = {
   create: createArticleSchema,

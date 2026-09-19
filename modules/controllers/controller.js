@@ -60,6 +60,7 @@ class Controller {
   }
   errorHandler(error, res) {
     if (error instanceof z.ZodError) {
+      console.log(error, "ERROR");
       return res.status(422).json({
         message: "Validation error",
         issues: error.issues.map((issue) => {
