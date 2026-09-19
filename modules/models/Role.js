@@ -49,7 +49,10 @@ const RoleSchema = new Schema(
       virtuals: true, //it means anytime executed toObject() method on this document
       //put virtual fields like id in final object
     },
-    timestamps: true,
+    timestamps: {
+      createdAt: "created_at",
+      updatedAt: "updated_at",
+    },
   },
 );
 

@@ -1,3 +1,5 @@
+const cheerio = require("cheerio");
+const mongoose = require("mongoose");
 /**
  * @param {object} file
  * @returns {boolean}
@@ -99,7 +101,33 @@ const getFileType = (mimetype) => {
   return "unknown";
 };
 
+/**
+ * @param {string} htmlString
+ * @returns {mongoose.Types.ObjectId[]}
+ */
+
+function extractMediaIdsFromHTML(htmlString) {
+  if (!htmlString || typeof htmlString !== "string") return [];
+
+  const $ = cheerio.load(htmlString);
+
+  const mediaIds = [];
+
+  $("img[data-media-id]").each((_, el) => {
+    const id = $(el).attr("data-media-id");
+
+    if (id && mongoose.isValidObjectId(id)) {
+      mediaIds.push(new mongoose.Types.ObjectId(id));
+    }
+  });
+
+  const uniqueIds = Array.from(new Set(mediaIds.map((id) => id.toString())));
+
+  return uniqueIds;
+}
+
 module.exports = {
+  extractMediaIdsFromHTML,
   isValidFileFieldname,
   validateFilesPayloadFormat,
   normalizeToRelativePath,

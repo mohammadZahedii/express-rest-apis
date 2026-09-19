@@ -105,7 +105,7 @@ class Controller {
     if (hasNonImage) {
       return {
         status: 400,
-        message: "Course images must be image files",
+        message: "medias must be image files",
       };
     }
 

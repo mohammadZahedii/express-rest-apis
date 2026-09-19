@@ -11,22 +11,18 @@ const createArticleSchema = z.object({
     error: "mediaId is invalid",
   }),
   category: z.string().nullable().default(null),
-  tags: z.array(
-    z.string().trim().min(5, "هر عنوان حداقل باید 2 کاراکتر داشته باشد"),
-  ),
+  tags: z
+    .array(z.string().trim().min(5, "هر عنوان حداقل باید 2 کاراکتر داشته باشد"))
+    .default([]),
   status: z.enum(STATUS_VALUES.article).default("published"),
   // TODO:normalize date input
-  publishedAt: z.date().nullable().default(null),
-  images: z
-    .array(
-      z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
-        error: "imageId is invalid",
-      }),
-    )
-    .default([]),
-  author: z.string().refine((val) => mongoose.Types.ObjectId.isValid(val), {
-    error: "authorId is invalid",
-  }),
+  publishedAt: z.date().nullable().default(null).optional(),
+  author: z
+    .string()
+    .refine((val) => mongoose.Types.ObjectId.isValid(val), {
+      error: "authorId is invalid",
+    })
+    .optional(),
 });
 
 const updateArticleSchema = createArticleSchema.partial();

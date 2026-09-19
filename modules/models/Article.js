@@ -45,9 +45,8 @@ const ArticleSchema = new Schema(
     status: {
       type: String,
       enum: ["draft", "published", "archived"],
-      default: "published",
+      default: "draft",
     },
-
     publishedAt: {
       type: Date,
       default: null,
@@ -78,17 +77,15 @@ const ArticleSchema = new Schema(
 
 ArticleSchema.plugin(MongoosePaginate);
 
-ArticleSchema.pre("save", function (next) {
+ArticleSchema.pre("save", function () {
   if (this.isModified("status")) {
     if (this.status === "published" && !this.publishedAt) {
       this.publishedAt = new Date();
     }
-
     if (this.status !== "published") {
       this.publishedAt = null;
     }
   }
-  next();
 });
 
 module.exports = mongoose.model("Article", ArticleSchema);
